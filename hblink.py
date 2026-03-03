@@ -382,7 +382,7 @@ class HBSYSTEM(DatagramProtocol):
                             self._laststrid[_slot] = _stream_id
                         return
                     if _slot == 2 and not acl_check(_dst_id, self._config['TG2_ACL']):
-                        if self._laststrid[_slot]!= _stream_id:
+                        if self._laststrid[_slot] != _stream_id:
                             logger.info('(%s) CALL DROPPED WITH STREAM ID %s ON TGID %s BY SYSTEM TS2 ACL', self._system, int_id(_stream_id), int_id(_dst_id))
                             self._laststrid[_slot] = _stream_id
                         return
@@ -529,6 +529,8 @@ class HBSYSTEM(DatagramProtocol):
 
         elif _command == DMRA:
             _peer_id = _data[4:8]
+            #GLUPI FIX
+            _rf_src = _data[5:8]
             logger.info('(%s) Recieved DMR Talker Alias from peer %s, subscriber %s', self._system, self._peers[_peer_id]['CALLSIGN'], int_id(_rf_src))
 
         else:
