@@ -30,12 +30,12 @@ sufficient logging to be used standalone as a troubleshooting application.
 # Specifig functions from modules we need
 from binascii import b2a_hex as ahex
 from binascii import a2b_hex as bhex
-from random import randint
 from secrets import randbelow
 from hashlib import sha256, sha1
 from hmac import new as hmac_new, compare_digest
 from time import time
 from collections import deque
+import os
 
 # Twisted is pretty important, so I keep it separate
 from twisted.internet.protocol import DatagramProtocol, Factory, Protocol
@@ -294,7 +294,7 @@ class HBSYSTEM(DatagramProtocol):
         radio3 = int.from_bytes(radio, 'big').to_bytes(3, 'big')
         radio4 = int.from_bytes(radio, 'big').to_bytes(4, 'big')
         xlx3   = xlx.to_bytes(3, 'big')
-        streamid = randint(0,255).to_bytes(1, 'big')+randint(0,255).to_bytes(1, 'big')+randint(0,255).to_bytes(1, 'big')+randint(0,255).to_bytes(1, 'big')
+        streamid = os.urandom(4)
         # Wait for .5 secs for the XLX to log us in
         for packetnr in range(5):
             if packetnr < 3:
@@ -455,7 +455,7 @@ class HBSYSTEM(DatagramProtocol):
                 _sent_hash = _data[8:]
                 _salt_str = bytes_4(_this_peer['SALT'])
                 _calc_hash = bhex(sha256(_salt_str+self._config['PASSPHRASE']).hexdigest())
-                if _sent_hash == _calc_hash:
+                if compare_digest(_sent_hash, _calc_hash):
                     _this_peer['CONNECTION'] = 'WAITING_CONFIG'
                     self.send_peer(_peer_id, b''.join([RPTACK, _peer_id]))
                     logger.info('(%s) Peer %s has completed the login exchange successfully', self._system, _this_peer['RADIO_ID'])
