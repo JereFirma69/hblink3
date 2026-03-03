@@ -31,6 +31,7 @@ sufficient logging to be used standalone as a troubleshooting application.
 from binascii import b2a_hex as ahex
 from binascii import a2b_hex as bhex
 from random import randint
+from secrets import randbelow
 from hashlib import sha256, sha1
 from hmac import new as hmac_new, compare_digest
 from time import time
@@ -415,7 +416,7 @@ class HBSYSTEM(DatagramProtocol):
                         'SOCKADDR': _sockaddr,
                         'IP': _sockaddr[0],
                         'PORT': _sockaddr[1],
-                        'SALT': randint(0,0xFFFFFFFF),
+                        'SALT': randbelow(0xFFFFFFFF),
                         'RADIO_ID': str(int(ahex(_peer_id), 16)),
                         'CALLSIGN': '',
                         'RX_FREQ': '',
