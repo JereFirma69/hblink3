@@ -1,17 +1,30 @@
+# Use lightweight Python base
 FROM python:3.9-alpine
 
-COPY entrypoint /entrypoint
+# Create a non-root user
+RUN adduser -D -u 54000 radio
 
-RUN adduser -D -u 54000 radio && \
-        apk update && \
-        apk add git gcc musl-dev && \
-        cd /opt && \
-        git clone https://github.com/ShaYmez/hblink3 && \
-        cd /opt/hblink3 && \
-        pip install --no-cache-dir -r requirements.txt && \
-        apk del git gcc musl-dev && \
-        chown -R radio: /opt/hblink3
+# Install build dependencies for pip packages
+RUN apk add --no-cache git gcc musl-dev bash
 
+# Create application directory and set ownership
+RUN mkdir -p /opt/hblink3 && chown radio:radio /opt/hblink3
+
+WORKDIR /opt/hblink3
+
+# Copy application code
+COPY --chown=radio:radio . .
+
+# Copy entrypoint and set permissions
+COPY --chown=radio:radio entrypoint /entrypoint
+RUN dos2unix /entrypoint && chmod +x /entrypoint
+
+# Install Python dependencies, then remove build dependencies to shrink image
+RUN pip install --no-cache-dir -r requirements.txt \
+    && apk del git gcc musl-dev
+
+# Switch to non-root user
 USER radio
 
-ENTRYPOINT [ "/entrypoint" ]
+# Use entrypoint
+ENTRYPOINT ["/entrypoint"]
