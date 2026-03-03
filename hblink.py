@@ -137,7 +137,14 @@ class OPENBRIDGE(DatagramProtocol):
         # Keep This Line Commented Unless HEAVILY Debugging!
         #logger.debug('(%s) RX packet from %s -- %s', self._system, _sockaddr, ahex(_packet))
 
+        if len(_packet) < 4:
+            logger.warning('(%s) OpenBridge packet too short to contain a command: %s bytes', self._system, len(_packet))
+            return
+
         if _packet[:4] == DMRD:    # DMRData -- encapsulated DMR data frame
+            if len(_packet) < 73:  # 53 bytes data + 20 bytes HMAC-SHA1
+                logger.warning('(%s) OpenBridge DMRD packet too short: %s bytes', self._system, len(_packet))
+                return
             _data = _packet[:53]
             _hash = _packet[53:]
             _ckhs = hmac_new(self._config['PASSPHRASE'],_data,sha1).digest()
@@ -330,10 +337,17 @@ class HBSYSTEM(DatagramProtocol):
         # Keep This Line Commented Unless HEAVILY Debugging!
         # logger.debug('(%s) RX packet from %s -- %s', self._system, _sockaddr, ahex(_data))
 
+        if len(_data) < 4:
+            logger.warning('(%s) Packet too short to contain a command: %s bytes', self._system, len(_data))
+            return
+
         # Extract the command, which is various length, all but one 4 significant characters -- RPTCL
         _command = _data[:4]
 
         if _command == DMRD:    # DMRData -- encapsulated DMR data frame
+            if len(_data) < 20:  # Minimum DMRD packet: header through stream_id
+                logger.warning('(%s) DMRD packet too short: %s bytes', self._system, len(_data))
+                return
             _peer_id = _data[11:15]
             if _peer_id in self._peers \
                         and self._peers[_peer_id]['CONNECTION'] == 'YES' \
@@ -542,11 +556,18 @@ class HBSYSTEM(DatagramProtocol):
         # Keep This Line Commented Unless HEAVILY Debugging!
         # logger.debug('(%s) RX packet from %s -- %s', self._system, _sockaddr, ahex(_data))
 
+        if len(_data) < 4:
+            logger.warning('(%s) Packet too short to contain a command: %s bytes', self._system, len(_data))
+            return
+
         # Validate that we receveived this packet from the master - security check!
         if self._config['MASTER_SOCKADDR'] == _sockaddr:
             # Extract the command, which is various length, but only 4 significant characters
             _command = _data[:4]
             if   _command == DMRD:    # DMRData -- encapsulated DMR data frame
+                if len(_data) < 20:  # Minimum DMRD packet: header through stream_id
+                    logger.warning('(%s) DMRD packet too short: %s bytes', self._system, len(_data))
+                    return
 
                 _peer_id = _data[11:15]
                 if self._config['LOOSE'] or _peer_id == self._config['RADIO_ID']: # Validate the Radio_ID unless using loose validation
