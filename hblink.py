@@ -471,7 +471,7 @@ class HBSYSTEM(DatagramProtocol):
                     logger.info('(%s) Sent Challenge Response to %s for login: %s', self._system, int_id(_peer_id), self._peers[_peer_id]['SALT'])
                 else:
                     self.transport.write(b''.join([MSTNAK, _peer_id]), _sockaddr)
-                    logger.warning('(%s) Invalid Login from %s Radio ID: %s Denied by Registation ACL', self._system, _sockaddr[0], int_id(_peer_id))
+                    logger.warning('(%s) Invalid Login from %s Radio ID: %s Denied by Registration ACL', self._system, _sockaddr[0], int_id(_peer_id))
             else:
                 self.transport.write(b''.join([MSTNAK, _peer_id]), _sockaddr)
                 logger.warning('(%s) Registration denied from Radio ID: %s Maximum number of peers exceeded', self._system, int_id(_peer_id))
@@ -491,7 +491,7 @@ class HBSYSTEM(DatagramProtocol):
                     self.send_peer(_peer_id, b''.join([RPTACK, _peer_id]))
                     logger.info('(%s) Peer %s has completed the login exchange successfully', self._system, _this_peer['RADIO_ID'])
                 else:
-                    logger.info('(%s) Peer %s has FAILED the login exchange successfully', self._system, _this_peer['RADIO_ID'])
+                    logger.warning('(%s) Peer %s has FAILED the login exchange', self._system, _this_peer['RADIO_ID'])
                     self.transport.write(b''.join([MSTNAK, _peer_id]), _sockaddr)
                     del self._peers[_peer_id]
             else:
@@ -563,7 +563,7 @@ class HBSYSTEM(DatagramProtocol):
             _peer_id = _data[4:8]
             #GLUPI FIX
             _rf_src = _data[5:8]
-            logger.info('(%s) Recieved DMR Talker Alias from peer %s, subscriber %s', self._system, self._peers[_peer_id]['CALLSIGN'], int_id(_rf_src))
+            logger.info('(%s) Received DMR Talker Alias from peer %s, subscriber %s', self._system, self._peers[_peer_id]['CALLSIGN'], int_id(_rf_src))
 
         else:
             logger.error('(%s) Unrecognized command. Raw HBP PDU: %s', self._system, ahex(_data))
@@ -746,7 +746,7 @@ class HBSYSTEM(DatagramProtocol):
 #
 # Socket-based reporting section
 #
-class report(NetstringReceiver):
+class Report(NetstringReceiver):
     def __init__(self, factory):
         self._factory = factory
 
@@ -769,14 +769,14 @@ class report(NetstringReceiver):
         else:
             logger.error('(REPORT) got unknown opcode')
 
-class reportFactory(Factory):
+class ReportFactory(Factory):
     def __init__(self, config):
         self._config = config
 
     def buildProtocol(self, addr):
         if (addr.host) in self._config['REPORTS']['REPORT_CLIENTS'] or '*' in self._config['REPORTS']['REPORT_CLIENTS']:
             logger.debug('(REPORT) Permitting report server connection attempt from: %s:%s', addr.host, addr.port)
-            return report(self)
+            return Report(self)
         else:
             logger.error('(REPORT) Invalid report server connection attempt from: %s:%s', addr.host, addr.port)
             return None
@@ -865,7 +865,7 @@ if __name__ == '__main__':
 
     # INITIALIZE THE REPORTING LOOP
     if CONFIG['REPORTS']['REPORT']:
-        report_server = config_reports(CONFIG, reportFactory)
+        report_server = config_reports(CONFIG, ReportFactory)
     else:
         report_server = None
         logger.info('(REPORT) TCP Socket reporting not configured')

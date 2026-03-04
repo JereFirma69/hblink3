@@ -31,7 +31,7 @@ from twisted.protocols.basic import NetstringReceiver
 from twisted.internet import reactor, task
 
 # Things we import from the main hblink module
-from hblink import HBSYSTEM, systems, hblink_handler, reportFactory, REPORT_OPCODES, config_reports, mk_aliases
+from hblink import HBSYSTEM, systems, hblink_handler, ReportFactory, REPORT_OPCODES, config_reports, mk_aliases
 from dmr_utils3.utils import bytes_3, int_id, get_alias
 from dmr_utils3 import decode, bptc, const
 import config
@@ -212,7 +212,7 @@ if __name__ == '__main__':
     peer_ids, subscriber_ids, talkgroup_ids = mk_aliases(CONFIG)
         
     # INITIALIZE THE REPORTING LOOP
-    report_server = config_reports(CONFIG, reportFactory)    
+    report_server = config_reports(CONFIG, ReportFactory)    
     
     # HBlink instance creation
     logger.info('HBlink \'playback.py\' (c) 2017-2019 Cort Buffington, N0MJS & Mike Zingman, N4IRR -- SYSTEM STARTING...')

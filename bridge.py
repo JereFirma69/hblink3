@@ -42,7 +42,7 @@ from twisted.protocols.basic import NetstringReceiver
 from twisted.internet import reactor, task
 
 # Things we import from the main hblink module
-from hblink import HBSYSTEM, OPENBRIDGE, systems, hblink_handler, reportFactory, REPORT_OPCODES, mk_aliases
+from hblink import HBSYSTEM, OPENBRIDGE, systems, hblink_handler, ReportFactory, REPORT_OPCODES, mk_aliases
 from dmr_utils3.utils import bytes_3, int_id, get_alias
 from dmr_utils3 import decode, bptc, const
 import config
@@ -884,7 +884,7 @@ class routerHBP(HBSYSTEM):
                                 _system['TIMER'] = pkt_time + _system['TIMEOUT']
                                 logger.info('(%s) Bridge: %s, timeout timer reset to: %s', self._system, _bridge, _system['TIMER'] - pkt_time)
                             # Cancel the timer if we've enabled an "ON" type timeout
-                            if _system['ACTIVE'] == True and _system['TO_TYPE'] == 'ON' and _dst_group in _system['OFF']:
+                            if _system['ACTIVE'] == True and _system['TO_TYPE'] == 'ON' and _dst_id in _system['OFF']:
                                 _system['TIMER'] = pkt_time
                                 logger.info('(%s) Bridge: %s set to ON with and "OFF" timer rule: timeout timer cancelled', self._system, _bridge)
 
@@ -1060,7 +1060,7 @@ class routerHBP(HBSYSTEM):
 #
 # Socket-based reporting section
 #
-class bridgeReportFactory(reportFactory):
+class bridgeReportFactory(ReportFactory):
 
     def send_bridge(self):
         serialized = pickle.dumps(BRIDGES, protocol=2) #.decode("utf-8", errors='ignore')
