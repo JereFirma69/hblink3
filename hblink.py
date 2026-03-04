@@ -216,6 +216,9 @@ class HBSYSTEM(DatagramProtocol):
         self._config = self._CONFIG['SYSTEMS'][self._system]
         self._laststrid = {1: b'', 2: b''}
 
+        # Rate limiting: track login attempts per IP {ip: [timestamp, timestamp, ...]}
+        self._login_attempts = {}
+
         # Define shortcuts and generic function names based on the type of system we are
         if self._config['MODE'] == 'MASTER':
             self._peers = self._CONFIG['SYSTEMS'][self._system]['PEERS']
@@ -417,6 +420,20 @@ class HBSYSTEM(DatagramProtocol):
 
         elif _command == RPTL:    # RPTLogin -- a repeater wants to login
             _peer_id = _data[4:8]
+
+            # Rate limit login attempts per IP (max 3 attempts per 60 seconds)
+            _ip = _sockaddr[0]
+            _now = time()
+            if _ip not in self._login_attempts:
+                self._login_attempts[_ip] = []
+            # Purge attempts older than 60 seconds
+            self._login_attempts[_ip] = [t for t in self._login_attempts[_ip] if _now - t < 60]
+            if len(self._login_attempts[_ip]) >= 3:
+                self.transport.write(b''.join([MSTNAK, _peer_id]), _sockaddr)
+                logger.warning('(%s) Login rate limited for IP %s Radio ID: %s (too many attempts)', self._system, _ip, int_id(_peer_id))
+                return
+            self._login_attempts[_ip].append(_now)
+
             # Check to see if we've reached the maximum number of allowed peers
             if len(self._peers) < self._config['MAX_PEERS']:
                 # Check for valid Radio ID
