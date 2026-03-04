@@ -38,7 +38,7 @@ from collections import deque
 import os
 
 # Twisted is pretty important, so I keep it separate
-from twisted.internet.protocol import DatagramProtocol, Factory, Protocol
+from twisted.internet.protocol import DatagramProtocol, Factory
 from twisted.protocols.basic import NetstringReceiver
 from twisted.internet import reactor, task
 
@@ -406,7 +406,7 @@ class HBSYSTEM(DatagramProtocol):
                         return
 
                 # The basic purpose of a master is to repeat to the peers
-                if self._config['REPEAT'] == True:
+                if self._config['REPEAT']:
                     pkt = [_data[:11], '', _data[15:]]
                     for _peer in self._peers:
                         if _peer != _peer_id:
@@ -793,7 +793,7 @@ class ReportFactory(Factory):
 # ID ALIAS CREATION
 # Download
 def mk_aliases(_config):
-    if _config['ALIASES']['TRY_DOWNLOAD'] == True:
+    if _config['ALIASES']['TRY_DOWNLOAD']:
         # Try updating peer aliases file
         result = try_download(_config['ALIASES']['PATH'], _config['ALIASES']['PEER_FILE'], _config['ALIASES']['PEER_URL'], _config['ALIASES']['STALE_TIME'])
         logger.info('(GLOBAL) %s', result)
