@@ -212,7 +212,11 @@ if __name__ == '__main__':
     peer_ids, subscriber_ids, talkgroup_ids = mk_aliases(CONFIG)
         
     # INITIALIZE THE REPORTING LOOP
-    report_server = config_reports(CONFIG, ReportFactory)    
+    if CONFIG['REPORTS']['REPORT']:
+        report_server = config_reports(CONFIG, ReportFactory)
+    else:
+        report_server = None
+        logger.info('(REPORT) TCP Socket reporting not configured')
     
     # HBlink instance creation
     logger.info('HBlink \'playback.py\' (c) 2017-2019 Cort Buffington, N0MJS & Mike Zingman, N4IRR -- SYSTEM STARTING...')
