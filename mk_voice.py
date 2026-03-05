@@ -105,4 +105,4 @@ if __name__ == '__main__':
             pkt = next(speech)
         except StopIteration:
             break
-        print(len(pkt), pkt[4], pkt)
+        logger.debug('%s %s %s', len(pkt), pkt[4], pkt)

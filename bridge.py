@@ -78,7 +78,7 @@ UNIT_MAP = {}
 #
 # REPORT BASED ON THE TYPE SELECTED IN THE MAIN CONFIG FILE
 def config_reports(_config, _factory):
-    if True: #_config['REPORTS']['REPORT']:
+    if _config['REPORTS']['REPORT']:
         def reporting_loop(logger, _server):
             logger.debug('(REPORT) Periodic reporting loop started')
             _server.send_config()

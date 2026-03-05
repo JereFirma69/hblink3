@@ -200,7 +200,7 @@ if __name__ == '__main__':
     
     # ID ALIAS CREATION
     # Download
-    if CONFIG['ALIASES']['TRY_DOWNLOAD'] == True:
+    if CONFIG['ALIASES']['TRY_DOWNLOAD']:
         # Try updating peer aliases file
         result = try_download(CONFIG['ALIASES']['PATH'], CONFIG['ALIASES']['PEER_FILE'], CONFIG['ALIASES']['PEER_URL'], CONFIG['ALIASES']['STALE_TIME'])
         logger.info(result)
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     for system in CONFIG['SYSTEMS']:
         if CONFIG['SYSTEMS'][system]['ENABLED']:
             if CONFIG['SYSTEMS'][system]['MODE'] == 'OPENBRIDGE':
-                logger.critical('%s FATAL: Instance is mode \'OPENBRIDGE\', \n\t\t...Which would be tragic for playback, since it carries multiple call\n\t\tstreams simultaneously. playback.py onlyl works with MMDVM-based systems', system)
+                logger.critical('%s FATAL: Instance is mode \'OPENBRIDGE\', \n\t\t...Which would be tragic for playback, since it carries multiple call\n\t\tstreams simultaneously. playback.py only works with MMDVM-based systems', system)
                 sys.exit('playback.py cannot function with systems that are not MMDVM devices. System {} is configured as an OPENBRIDGE'.format(system))
             else:
                 systems[system] = playback(system, CONFIG, report_server)
