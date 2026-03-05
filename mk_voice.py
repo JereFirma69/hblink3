@@ -22,7 +22,7 @@ from bitarray import bitarray
 from dmr_utils3 import bptc, golay, qr
 from dmr_utils3.utils import bytes_3, bytes_4
 from dmr_utils3.const import EMB, SLOT_TYPE, BS_VOICE_SYNC, BS_DATA_SYNC, LC_OPT
-from random import randint
+import os
 from voice_lib import words
 
 # Precalculated "dmrbits" (DMRD packet byte 15) -- just (slot << 7 | this value) and you're good to go!
@@ -42,7 +42,7 @@ TAIL = b'\x00\x00'
 def pkt_gen(_rf_src, _dst_id, _peer, _slot, _phrase):
 
     # Calculate all of the static components up-front
-    STREAM_ID = bytes_4(randint(0x00, 0xFFFFFFFF))
+    STREAM_ID = os.urandom(4)
     SDP = _rf_src + _dst_id + _peer
     LC = LC_OPT + _dst_id + _rf_src
     
