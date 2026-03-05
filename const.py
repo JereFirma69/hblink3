@@ -74,3 +74,13 @@ RPTSBKN = b'RPTSBKN'
 
 # Higheset peer ID permitted by HBP
 PEER_MAX = 4294967295
+
+# DMRD Packet Field Offsets
+# Byte layout: [0:4]=Command, [4]=Sequence, [5:8]=RF Source, [8:11]=Dest ID,
+#              [11:15]=Peer ID, [15]=Bits, [16:20]=Stream ID, [20:53]=DMR Data
+DMRD_SEQ       = 4            # Sequence number (single byte)
+DMRD_RF_SRC    = slice(5, 8)  # RF Source ID (3 bytes)
+DMRD_DST_ID    = slice(8, 11) # Destination ID (3 bytes)
+DMRD_PEER_ID   = slice(11, 15)# Peer ID (4 bytes)
+DMRD_BITS      = 15           # Slot/Call Type/Frame Type flags (single byte)
+DMRD_STREAM_ID = slice(16, 20)# Stream ID (4 bytes)

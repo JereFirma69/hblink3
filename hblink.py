@@ -200,11 +200,11 @@ class OPENBRIDGE(DatagramProtocol):
             _ckhs = hmac_new(self._config['PASSPHRASE'],_data,sha1).digest()
 
             if compare_digest(_hash, _ckhs) and _sockaddr == self._config['TARGET_SOCK']:
-                _peer_id = _data[11:15]
-                _seq = _data[4]
-                _rf_src = _data[5:8]
-                _dst_id = _data[8:11]
-                _bits = _data[15]
+                _peer_id = _data[DMRD_PEER_ID]
+                _seq = _data[DMRD_SEQ]
+                _rf_src = _data[DMRD_RF_SRC]
+                _dst_id = _data[DMRD_DST_ID]
+                _bits = _data[DMRD_BITS]
                 _slot = 2 if (_bits & 0x80) else 1
                 #_call_type = 'unit' if (_bits & 0x40) else 'group'
                 if _bits & 0x40:
@@ -215,8 +215,7 @@ class OPENBRIDGE(DatagramProtocol):
                     _call_type = 'group'
                 _frame_type = (_bits & 0x30) >> 4
                 _dtype_vseq = (_bits & 0xF) # data, 1=voice header, 2=voice terminator; voice, 0=burst A ... 5=burst F
-                _stream_id = _data[16:20]
-                #logger.debug('(%s) DMRD - Seqence: %s, RF Source: %s, Destination ID: %s', self._system, int_id(_seq), int_id(_rf_src), int_id(_dst_id))
+                _stream_id = _data[DMRD_STREAM_ID]
 
                 # Sanity check for OpenBridge -- all calls must be on Slot 1 for Brandmeister or DMR+. Other HBlinks can process timeslot on OPB if the flag is set
                 if _slot != 1 and not self._config['BOTH_SLOTS'] and not _call_type == 'unit':
@@ -381,14 +380,14 @@ class HBSYSTEM(DatagramProtocol):
             if len(_data) < 20:  # Minimum DMRD packet: header through stream_id
                 logger.warning('(%s) DMRD packet too short: %s bytes', self._system, len(_data))
                 return
-            _peer_id = _data[11:15]
+            _peer_id = _data[DMRD_PEER_ID]
             if _peer_id in self._peers \
                         and self._peers[_peer_id]['CONNECTION'] == 'YES' \
                         and self._peers[_peer_id]['SOCKADDR'] == _sockaddr:
-                _seq = _data[4]
-                _rf_src = _data[5:8]
-                _dst_id = _data[8:11]
-                _bits = _data[15]
+                _seq = _data[DMRD_SEQ]
+                _rf_src = _data[DMRD_RF_SRC]
+                _dst_id = _data[DMRD_DST_ID]
+                _bits = _data[DMRD_BITS]
                 _slot = 2 if (_bits & 0x80) else 1
                 #_call_type = 'unit' if (_bits & 0x40) else 'group'
                 if _bits & 0x40:
@@ -399,7 +398,7 @@ class HBSYSTEM(DatagramProtocol):
                     _call_type = 'group'
                 _frame_type = (_bits & 0x30) >> 4
                 _dtype_vseq = (_bits & 0xF) # data, 1=voice header, 2=voice terminator; voice, 0=burst A ... 5=burst F
-                _stream_id = _data[16:20]
+                _stream_id = _data[DMRD_STREAM_ID]
                 #logger.debug('(%s) DMRD - Seqence: %s, RF Source: %s, Destination ID: %s', self._system, _seq, int_id(_rf_src), int_id(_dst_id))
                 # ACL Processing
                 if acl_reject(self._system, self._CONFIG['GLOBAL'], self._config, _rf_src, _dst_id, _slot, _stream_id, self._laststrid):
@@ -586,12 +585,12 @@ class HBSYSTEM(DatagramProtocol):
                     logger.warning('(%s) DMRD packet too short: %s bytes', self._system, len(_data))
                     return
 
-                _peer_id = _data[11:15]
+                _peer_id = _data[DMRD_PEER_ID]
                 if self._config['LOOSE'] or _peer_id == self._config['RADIO_ID']: # Validate the Radio_ID unless using loose validation
                     _seq = _data[4:5]
-                    _rf_src = _data[5:8]
-                    _dst_id = _data[8:11]
-                    _bits = _data[15]
+                    _rf_src = _data[DMRD_RF_SRC]
+                    _dst_id = _data[DMRD_DST_ID]
+                    _bits = _data[DMRD_BITS]
                     _slot = 2 if (_bits & 0x80) else 1
                     #_call_type = 'unit' if (_bits & 0x40) else 'group'
                     if _bits & 0x40:
@@ -602,7 +601,7 @@ class HBSYSTEM(DatagramProtocol):
                         _call_type = 'group'
                     _frame_type = (_bits & 0x30) >> 4
                     _dtype_vseq = (_bits & 0xF) # data, 1=voice header, 2=voice terminator; voice, 0=burst A ... 5=burst F
-                    _stream_id = _data[16:20]
+                    _stream_id = _data[DMRD_STREAM_ID]
                     #logger.debug('(%s) DMRD - Sequence: %s, RF Source: %s, Destination ID: %s', self._system, int_id(_seq), int_id(_rf_src), int_id(_dst_id))
 
                     # ACL Processing
