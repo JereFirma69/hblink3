@@ -23,7 +23,10 @@ from dmr_utils3 import bptc, golay, qr
 from dmr_utils3.utils import bytes_3, bytes_4
 from dmr_utils3.const import EMB, SLOT_TYPE, BS_VOICE_SYNC, BS_DATA_SYNC, LC_OPT
 import os
+import logging
 from voice_lib import words
+
+logger = logging.getLogger(__name__)
 
 # Precalculated "dmrbits" (DMRD packet byte 15) -- just (slot << 7 | this value) and you're good to go!
 HEADBITS  = 0b00100001
@@ -77,7 +80,7 @@ def pkt_gen(_rf_src, _dst_id, _peer, _slot, _phrase):
     # Send each burst, six bursts per Superframe rotating through with the proper EMBED value per burst A-F
     for word in _phrase:
         for burst in range(0, len(word)):
-            print(burst)
+            logger.debug('Generating voice burst %s', burst)
             pkt = b'DMRD' + bytes([SEQ]) + SDP + bytes([_slot << 7 | BURSTBITS[burst % 6]]) + STREAM_ID + (word[burst + 0][0] + EMBED[burst % 6] + word[burst + 0][1]).tobytes() + TAIL
             SEQ = (SEQ + 1) % 0x100
             yield pkt
