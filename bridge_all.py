@@ -95,7 +95,7 @@ class bridgeallSYSTEM(HBSYSTEM):
                 },
             2: {
                 'RX_START':     time(),
-                'RX:LOSS':      0,
+                'RX_LOSS':      0,
                 'RX_SEQ':       0,
                 'RX_RFS':       b'\x00',
                 'TX_RFS':       b'\x00',

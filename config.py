@@ -31,7 +31,7 @@ import sys
 import os
 import const
 
-from socket import gethostbyname
+from socket import gethostbyname, gaierror
 
 # Does anybody read this stuff? There's a PEP somewhere that says I should do this.
 __author__     = 'Cortney T. Buffington, N0MJS'
@@ -111,6 +111,12 @@ def _validate_log_path(log_file):
         if not os.path.isdir(log_dir):
             sys.exit('CONFIG ERROR in [LOGGER]: LOG_FILE directory does not exist: {}'.format(log_dir))
 
+def _resolve_hostname(hostname, section):
+    try:
+        return gethostbyname(hostname)
+    except gaierror as err:
+        sys.exit('CONFIG ERROR in [{}]: Cannot resolve hostname \'{}\': {}'.format(section, hostname, err))
+
 def build_config(_config_file):
     config = configparser.ConfigParser()
 
@@ -174,11 +180,11 @@ def build_config(_config_file):
                         'MODE': config.get(section, 'MODE'),
                         'ENABLED': config.getboolean(section, 'ENABLED'),
                         'LOOSE': config.getboolean(section, 'LOOSE'),
-                        'SOCK_ADDR': (gethostbyname(config.get(section, 'IP')), config.getint(section, 'PORT')),
-                        'IP': gethostbyname(config.get(section, 'IP')),
+                        'SOCK_ADDR': (_resolve_hostname(config.get(section, 'IP'), section), config.getint(section, 'PORT')),
+                        'IP': _resolve_hostname(config.get(section, 'IP'), section),
                         'PORT': config.getint(section, 'PORT'),
-                        'MASTER_SOCKADDR': (gethostbyname(config.get(section, 'MASTER_IP')), config.getint(section, 'MASTER_PORT')),
-                        'MASTER_IP': gethostbyname(config.get(section, 'MASTER_IP')),
+                        'MASTER_SOCKADDR': (_resolve_hostname(config.get(section, 'MASTER_IP'), section), config.getint(section, 'MASTER_PORT')),
+                        'MASTER_IP': _resolve_hostname(config.get(section, 'MASTER_IP'), section),
                         'MASTER_PORT': config.getint(section, 'MASTER_PORT'),
                         'PASSPHRASE': bytes(config.get(section, 'PASSPHRASE'), 'utf-8'),
                         'CALLSIGN': bytes(config.get(section, 'CALLSIGN').ljust(8)[:8], 'utf-8'),
@@ -219,11 +225,11 @@ def build_config(_config_file):
                         'MODE': config.get(section, 'MODE'),
                         'ENABLED': config.getboolean(section, 'ENABLED'),
                         'LOOSE': config.getboolean(section, 'LOOSE'),
-                        'SOCK_ADDR': (gethostbyname(config.get(section, 'IP')), config.getint(section, 'PORT')),
-                        'IP': gethostbyname(config.get(section, 'IP')),
+                        'SOCK_ADDR': (_resolve_hostname(config.get(section, 'IP'), section), config.getint(section, 'PORT')),
+                        'IP': _resolve_hostname(config.get(section, 'IP'), section),
                         'PORT': config.getint(section, 'PORT'),
-                        'MASTER_SOCKADDR': (gethostbyname(config.get(section, 'MASTER_IP')), config.getint(section, 'MASTER_PORT')),
-                        'MASTER_IP': gethostbyname(config.get(section, 'MASTER_IP')),
+                        'MASTER_SOCKADDR': (_resolve_hostname(config.get(section, 'MASTER_IP'), section), config.getint(section, 'MASTER_PORT')),
+                        'MASTER_IP': _resolve_hostname(config.get(section, 'MASTER_IP'), section),
                         'MASTER_PORT': config.getint(section, 'MASTER_PORT'),
                         'PASSPHRASE': bytes(config.get(section, 'PASSPHRASE'), 'utf-8'),
                         'CALLSIGN': bytes(config.get(section, 'CALLSIGN').ljust(8)[:8], 'utf-8'),
@@ -266,7 +272,7 @@ def build_config(_config_file):
                         'ENABLED': config.getboolean(section, 'ENABLED'),
                         'REPEAT': config.getboolean(section, 'REPEAT'),
                         'MAX_PEERS': config.getint(section, 'MAX_PEERS'),
-                        'IP': gethostbyname(config.get(section, 'IP')),
+                        'IP': _resolve_hostname(config.get(section, 'IP'), section),
                         'PORT': config.getint(section, 'PORT'),
                         'PASSPHRASE': bytes(config.get(section, 'PASSPHRASE'), 'utf-8'),
                         'GROUP_HANGTIME': config.getint(section, 'GROUP_HANGTIME'),
@@ -283,11 +289,11 @@ def build_config(_config_file):
                         'MODE': config.get(section, 'MODE'),
                         'ENABLED': config.getboolean(section, 'ENABLED'),
                         'NETWORK_ID': config.getint(section, 'NETWORK_ID').to_bytes(4, 'big'),
-                        'IP': gethostbyname(config.get(section, 'IP')),
+                        'IP': _resolve_hostname(config.get(section, 'IP'), section),
                         'PORT': config.getint(section, 'PORT'),
                         'PASSPHRASE': bytes(config.get(section, 'PASSPHRASE').ljust(20,'\x00')[:20], 'utf-8'),
-                        'TARGET_SOCK': (gethostbyname(config.get(section, 'TARGET_IP')), config.getint(section, 'TARGET_PORT')),
-                        'TARGET_IP': gethostbyname(config.get(section, 'TARGET_IP')),
+                        'TARGET_SOCK': (_resolve_hostname(config.get(section, 'TARGET_IP'), section), config.getint(section, 'TARGET_PORT')),
+                        'TARGET_IP': _resolve_hostname(config.get(section, 'TARGET_IP'), section),
                         'TARGET_PORT': config.getint(section, 'TARGET_PORT'),
                         'BOTH_SLOTS': config.getboolean(section, 'BOTH_SLOTS'),
                         'USE_ACL': config.getboolean(section, 'USE_ACL'),

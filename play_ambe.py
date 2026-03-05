@@ -31,7 +31,7 @@ from twisted.protocols.basic import NetstringReceiver
 from twisted.internet import reactor, task
 
 # Things we import from the main hblink module
-from hblink import HBSYSTEM, OPENBRIDGE, systems, hblink_handler, ReportFactory, REPORT_OPCODES, mk_aliases
+from hblink import HBSYSTEM, OPENBRIDGE, systems, hblink_handler, ReportFactory, REPORT_OPCODES, config_reports, mk_aliases
 from dmr_utils3.utils import bytes_3, bytes_4, int_id, get_alias
 from dmr_utils3 import decode, bptc, const
 import config
@@ -77,9 +77,9 @@ class HBP(HBSYSTEM):
 
     def dmrd_received(self, _peer_id, _rf_src, _dst_id, _seq, _slot, _call_type, _frame_type, _dtype_vseq, _stream_id, _data):
         if (_frame_type == HBPF_DATA_SYNC) and (_dtype_vseq == HBPF_SLT_VTERM) and (_stream_id != self.last_stream):
-            print(int_id(_stream_id), int_id(self.last_stream))
+            logger.debug('%s %s', int_id(_stream_id), int_id(self.last_stream))
             self.last_stream = _stream_id
-            print('start speech')
+            logger.debug('start speech')
             speech = pkt_gen(bytes_3(3120101), bytes_3(2), bytes_4(3120119), 0, [words['all_circuits'],words['all_circuits']])
     
             sleep(1)
@@ -90,8 +90,8 @@ class HBP(HBSYSTEM):
                     break
                 sleep(.058)
                 self.send_system(pkt)
-                print(bhex(pkt))
-            print('end speech')
+                logger.debug(bhex(pkt))
+            logger.debug('end speech')
 
 
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     # INITIALIZE THE REPORTING LOOP
     if CONFIG['REPORTS']['REPORT']:
-        report_server = config_reports(CONFIG, bridgeReportFactory)
+        report_server = config_reports(CONFIG, ReportFactory)
     else:
         report_server = None
         logger.info('(REPORT) TCP Socket reporting not configured')
