@@ -28,6 +28,7 @@ change.
 
 import configparser
 import sys
+import os
 import const
 
 from socket import gethostbyname
@@ -95,6 +96,20 @@ def acl_build(_acl, _max):
                  sys.exit('ACL CREATION ERROR, VALUE OUT OF RANGE ({} - {}) IN SINGLE ID ENTRY: {}'.format(const.ID_MIN, _max, entry))
 
     return (action, acl)
+
+def _validate_port(port, section):
+    if not (1 <= port <= 65535):
+        sys.exit('CONFIG ERROR in [{}]: PORT {} is out of valid range (1-65535)'.format(section, port))
+
+def _validate_radio_id(radio_id, section):
+    if not (const.ID_MIN <= radio_id <= const.ID_MAX):
+        sys.exit('CONFIG ERROR in [{}]: RADIO_ID {} is out of valid range ({}-{})'.format(section, radio_id, const.ID_MIN, const.ID_MAX))
+
+def _validate_log_path(log_file):
+    if log_file and log_file != '/dev/null':
+        log_dir = os.path.dirname(os.path.abspath(log_file))
+        if not os.path.isdir(log_dir):
+            sys.exit('CONFIG ERROR in [LOGGER]: LOG_FILE directory does not exist: {}'.format(log_dir))
 
 def build_config(_config_file):
     config = configparser.ConfigParser()
@@ -284,7 +299,22 @@ def build_config(_config_file):
     
     except configparser.Error as err:
         sys.exit('Error processing configuration file -- {}'.format(err))
-        
+
+    # Validate critical configuration values
+    _validate_log_path(CONFIG['LOGGER'].get('LOG_FILE', ''))
+
+    if 'REPORTS' in CONFIG and CONFIG['REPORTS'].get('REPORT'):
+        _validate_port(CONFIG['REPORTS']['REPORT_PORT'], 'REPORTS')
+
+    for system in CONFIG['SYSTEMS']:
+        _sys = CONFIG['SYSTEMS'][system]
+        _validate_port(_sys['PORT'], system)
+        if _sys['MODE'] in ('PEER', 'XLXPEER'):
+            _validate_port(_sys['MASTER_PORT'], system)
+            _validate_radio_id(int.from_bytes(_sys['RADIO_ID'], 'big'), system)
+        elif _sys['MODE'] == 'OPENBRIDGE':
+            _validate_port(_sys['TARGET_PORT'], system)
+
     process_acls(CONFIG)
     
     return CONFIG
