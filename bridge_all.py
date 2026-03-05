@@ -285,7 +285,7 @@ if __name__ == '__main__':
     for system in CONFIG['SYSTEMS']:
         if CONFIG['SYSTEMS'][system]['ENABLED']:
             if CONFIG['SYSTEMS'][system]['MODE'] == 'OPENBRIDGE':
-                logger.critical('%s FATAL: Instance is mode \'OPENBRIDGE\', \n\t\t...Which would be tragic for Bridge All, since it carries multiple call\n\t\tstreams simultaneously. bridge_all.py onlyl works with MMDVM-based systems', system)
+                logger.critical('%s FATAL: Instance is mode \'OPENBRIDGE\', \n\t\t...Which would be tragic for Bridge All, since it carries multiple call\n\t\tstreams simultaneously. bridge_all.py only works with MMDVM-based systems', system)
                 sys.exit('bridge_all.py cannot function with systems that are not MMDVM devices. System {} is configured as an OPENBRIDGE'.format(system))
             else:
                 systems[system] = bridgeallSYSTEM(system, CONFIG, report_server)

@@ -114,7 +114,7 @@ def make_bridges(_rules):
             for i, e in enumerate(_system['OFF']):
                 _system['OFF'][i] = bytes_3(_system['OFF'][i])
             _system['TIMEOUT']    = _system['TIMEOUT']*60
-            if _system['ACTIVE'] == True:
+            if _system['ACTIVE']:
                 _system['TIMER']  = time() + _system['TIMEOUT']
             else:
                 _system['TIMER']  = time()
@@ -130,24 +130,24 @@ def rule_timer_loop():
     for _bridge in BRIDGES:
         for _system in BRIDGES[_bridge]:
             if _system['TO_TYPE'] == 'ON':
-                if _system['ACTIVE'] == True:
+                if _system['ACTIVE']:
                     if _system['TIMER'] < _now:
                         _system['ACTIVE'] = False
                         logger.info('(ROUTER) Conference Bridge TIMEOUT: DEACTIVATE System: %s, Bridge: %s, TS: %s, TGID: %s', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']))
                     else:
                         timeout_in = _system['TIMER'] - _now
                         logger.info('(ROUTER) Conference Bridge ACTIVE (ON timer running): System: %s Bridge: %s, TS: %s, TGID: %s, Timeout in: %.2fs,', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']),  timeout_in)
-                elif _system['ACTIVE'] == False:
+                elif not _system['ACTIVE']:
                     logger.debug('(ROUTER) Conference Bridge INACTIVE (no change): System: %s Bridge: %s, TS: %s, TGID: %s', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']))
             elif _system['TO_TYPE'] == 'OFF':
-                if _system['ACTIVE'] == False:
+                if not _system['ACTIVE']:
                     if _system['TIMER'] < _now:
                         _system['ACTIVE'] = True
                         logger.info('(ROUTER) Conference Bridge TIMEOUT: ACTIVATE System: %s, Bridge: %s, TS: %s, TGID: %s', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']))
                     else:
                         timeout_in = _system['TIMER'] - _now
                         logger.info('(ROUTER) Conference Bridge INACTIVE (OFF timer running): System: %s Bridge: %s, TS: %s, TGID: %s, Timeout in: %.2fs,', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']),  timeout_in)
-                elif _system['ACTIVE'] == True:
+                elif _system['ACTIVE']:
                     logger.debug('(ROUTER) Conference Bridge ACTIVE (no change): System: %s Bridge: %s, TS: %s, TGID: %s', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']))
             else:
                 logger.debug('(ROUTER) Conference Bridge NO ACTION: System: %s, Bridge: %s, TS: %s, TGID: %s', _system['SYSTEM'], _bridge, _system['TS'], int_id(_system['TGID']))
@@ -267,7 +267,7 @@ class routerOBP(OPENBRIDGE):
         for _bridge in BRIDGES:
             for _system in BRIDGES[_bridge]:
 
-                if (_system['SYSTEM'] == self._system and _system['TGID'] == _dst_id and _system['TS'] == _slot and _system['ACTIVE'] == True):
+                if (_system['SYSTEM'] == self._system and _system['TGID'] == _dst_id and _system['TS'] == _slot and _system['ACTIVE']):
 
                     for _target in BRIDGES[_bridge]:
                         if (_target['SYSTEM'] != self._system) and (_target['ACTIVE']):
@@ -335,22 +335,22 @@ class routerOBP(OPENBRIDGE):
                                 # The "continue" at the end of each means the next iteration of the for loop that tests for matching rules
                                 #
                                 if ((_target['TGID'] != _target_status[_target['TS']]['RX_TGID']) and ((pkt_time - _target_status[_target['TS']]['RX_TIME']) < _target_system['GROUP_HANGTIME'])):
-                                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                                    if not self.STATUS[_stream_id]['CONTENTION']:
                                         self.STATUS[_stream_id]['CONTENTION'] = True
                                         logger.info('(%s) Call not routed to TGID %s, target active or in group hangtime: HBSystem: %s, TS: %s, TGID: %s', self._system, int_id(_target['TGID']), _target['SYSTEM'], _target['TS'], int_id(_target_status[_target['TS']]['RX_TGID']))
                                     continue
                                 if ((_target['TGID'] != _target_status[_target['TS']]['TX_TGID']) and ((pkt_time - _target_status[_target['TS']]['TX_TIME']) < _target_system['GROUP_HANGTIME'])):
-                                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                                    if not self.STATUS[_stream_id]['CONTENTION']:
                                         self.STATUS[_stream_id]['CONTENTION'] = True
                                         logger.info('(%s) Call not routed to TGID%s, target in group hangtime: HBSystem: %s, TS: %s, TGID: %s', self._system, int_id(_target['TGID']), _target['SYSTEM'], _target['TS'], int_id(_target_status[_target['TS']]['TX_TGID']))
                                     continue
                                 if (_target['TGID'] == _target_status[_target['TS']]['RX_TGID']) and ((pkt_time - _target_status[_target['TS']]['RX_TIME']) < STREAM_TO):
-                                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                                    if not self.STATUS[_stream_id]['CONTENTION']:
                                         self.STATUS[_stream_id]['CONTENTION'] = True
                                         logger.info('(%s) Call not routed to TGID%s, matching call already active on target: HBSystem: %s, TS: %s, TGID: %s', self._system, int_id(_target['TGID']), _target['SYSTEM'], _target['TS'], int_id(_target_status[_target['TS']]['RX_TGID']))
                                     continue
                                 if (_target['TGID'] == _target_status[_target['TS']]['TX_TGID']) and (_rf_src != _target_status[_target['TS']]['TX_RFS']) and ((pkt_time - _target_status[_target['TS']]['TX_TIME']) < STREAM_TO):
-                                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                                    if not self.STATUS[_stream_id]['CONTENTION']:
                                         self.STATUS[_stream_id]['CONTENTION'] = True
                                         logger.info('(%s) Call not routed for subscriber %s, call route in progress on target: HBSystem: %s, TS: %s, TGID: %s, SUB: %s', self._system, int_id(_rf_src), _target['SYSTEM'], _target['TS'], int_id(_target_status[_target['TS']]['TX_TGID']), int_id(_target_status[_target['TS']]['TX_RFS']))
                                     continue
@@ -523,12 +523,12 @@ class routerOBP(OPENBRIDGE):
                     continue
                 '''
                 if (_dst_id == _target_status[_slot]['RX_TGID']) and ((pkt_time - _target_status[_slot]['RX_TIME']) < STREAM_TO):
-                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                    if not self.STATUS[_stream_id]['CONTENTION']:
                         self.STATUS[_stream_id]['CONTENTION'] = True
                         logger.info('(%s) Call not routed to TGID%s, matching call already active on target: HBSystem: %s, TS: %s, TGID: %s', self._system, int_id(_dst_id), _target, _slot, int_id(_target_status[_slot]['RX_TGID']))
                     continue
                 if (_dst_id == _target_status[_slot]['TX_TGID']) and (_rf_src != _target_status[_slot]['TX_RFS']) and ((pkt_time - _target_status[_slot]['TX_TIME']) < STREAM_TO):
-                    if self.STATUS[_stream_id]['CONTENTION'] == False:
+                    if not self.STATUS[_stream_id]['CONTENTION']:
                         self.STATUS[_stream_id]['CONTENTION'] = True
                         logger.info('(%s) Call not routed for subscriber %s, call route in progress on target: HBSystem: %s, TS: %s, TGID: %s, SUB: %s', self._system, int_id(_rf_src), _target, _slot, int_id(_target_status[_slot]['TX_TGID']), int_id(_target_status[_slot]['TX_RFS']))
                     continue
@@ -684,7 +684,7 @@ class routerHBP(HBSYSTEM):
         for _bridge in BRIDGES:
             for _system in BRIDGES[_bridge]:
 
-                if (_system['SYSTEM'] == self._system and _system['TGID'] == _dst_id and _system['TS'] == _slot and _system['ACTIVE'] == True):
+                if (_system['SYSTEM'] == self._system and _system['TGID'] == _dst_id and _system['TS'] == _slot and _system['ACTIVE']):
 
                     for _target in BRIDGES[_bridge]:
                         if _target['SYSTEM'] != self._system or (_target['SYSTEM'] == self._system and _target['TS'] != _slot):
@@ -847,7 +847,7 @@ class routerHBP(HBSYSTEM):
                     if _system['SYSTEM'] == self._system:
 
                         # TGID matches a rule source, reset its timer
-                        if _slot == _system['TS'] and _dst_id == _system['TGID'] and ((_system['TO_TYPE'] == 'ON' and (_system['ACTIVE'] == True)) or (_system['TO_TYPE'] == 'OFF' and _system['ACTIVE'] == False)):
+                        if _slot == _system['TS'] and _dst_id == _system['TGID'] and ((_system['TO_TYPE'] == 'ON' and _system['ACTIVE']) or (_system['TO_TYPE'] == 'OFF' and not _system['ACTIVE'])):
                             _system['TIMER'] = pkt_time + _system['TIMEOUT']
                             logger.info('(%s) Transmission match for Bridge: %s. Reset timeout to %s', self._system, _bridge, _system['TIMER'])
 
@@ -855,7 +855,7 @@ class routerHBP(HBSYSTEM):
                         if (_dst_id in _system['ON'] or _dst_id in _system['RESET']) and _slot == _system['TS']:
                             # Set the matching rule as ACTIVE
                             if _dst_id in _system['ON']:
-                                if _system['ACTIVE'] == False:
+                                if not _system['ACTIVE']:
                                     _system['ACTIVE'] = True
                                     _system['TIMER'] = pkt_time + _system['TIMEOUT']
                                     logger.info('(%s) Bridge: %s, connection changed to state: %s', self._system, _bridge, _system['ACTIVE'])
@@ -864,7 +864,7 @@ class routerHBP(HBSYSTEM):
                                         _system['TIMER'] = pkt_time
                                         logger.info('(%s) Bridge: %s set to "OFF" with an on timer rule: timeout timer cancelled', self._system, _bridge)
                             # Reset the timer for the rule
-                            if _system['ACTIVE'] == True and _system['TO_TYPE'] == 'ON':
+                            if _system['ACTIVE'] and _system['TO_TYPE'] == 'ON':
                                 _system['TIMER'] = pkt_time + _system['TIMEOUT']
                                 logger.info('(%s) Bridge: %s, timeout timer reset to: %s', self._system, _bridge, _system['TIMER'] - pkt_time)
 
@@ -872,7 +872,7 @@ class routerHBP(HBSYSTEM):
                         if (_dst_id in _system['OFF']  or _dst_id in _system['RESET']) and _slot == _system['TS']:
                             # Set the matching rule as ACTIVE
                             if _dst_id in _system['OFF']:
-                                if _system['ACTIVE'] == True:
+                                if _system['ACTIVE']:
                                     _system['ACTIVE'] = False
                                     logger.info('(%s) Bridge: %s, connection changed to state: %s', self._system, _bridge, _system['ACTIVE'])
                                     # Cancel the timer if we've enabled an "ON" type timeout
@@ -880,11 +880,11 @@ class routerHBP(HBSYSTEM):
                                         _system['TIMER'] = pkt_time
                                         logger.info('(%s) Bridge: %s set to ON with and "OFF" timer rule: timeout timer cancelled', self._system, _bridge)
                             # Reset the timer for the rule
-                            if _system['ACTIVE'] == False and _system['TO_TYPE'] == 'OFF':
+                            if not _system['ACTIVE'] and _system['TO_TYPE'] == 'OFF':
                                 _system['TIMER'] = pkt_time + _system['TIMEOUT']
                                 logger.info('(%s) Bridge: %s, timeout timer reset to: %s', self._system, _bridge, _system['TIMER'] - pkt_time)
                             # Cancel the timer if we've enabled an "ON" type timeout
-                            if _system['ACTIVE'] == True and _system['TO_TYPE'] == 'ON' and _dst_id in _system['OFF']:
+                            if _system['ACTIVE'] and _system['TO_TYPE'] == 'ON' and _dst_id in _system['OFF']:
                                 _system['TIMER'] = pkt_time
                                 logger.info('(%s) Bridge: %s set to ON with and "OFF" timer rule: timeout timer cancelled', self._system, _bridge)
 
