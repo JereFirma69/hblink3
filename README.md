@@ -99,8 +99,7 @@ Users and contributors are encouraged to open GitHub Issues for questions, bug r
 
 Copyright (C) 2016-2020 Cortney T. Buffington, N0MJS n0mjs@me.com
 
-Copyright (C) 2026–present JereFirma69 (9A3COX)
-[dorian.jercic@gmail.com](mailto:dorian.jercic@gmail.com)
+Copyright (C) 2026–present Dorian Jerčić, 9A3COX [dorian.jercic@gmail.com](mailto:dorian.jercic@gmail.com)
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
