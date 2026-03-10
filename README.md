@@ -1,17 +1,40 @@
-## NOTE: THIS REPOSITORY HAS BEEN ARCHIVED, NO FURTHER DEVELOPMENT IS EXPECTED. ANY PULL REQUESTS WILL BE IGNORED
+# Project Status
+
+### ⚠️ **Important:** The original repository has been **archived by its maintainers**, and no further development is expected there.
+
+This fork continues the development of the project and is now **actively maintained**. The goal of this repository is to preserve the functionality of the original project while introducing new features, improvements, and bug fixes.
+
+### What this means
+
+* Development continues in this repository
+* Issues and pull requests are welcome
+* New features and improvements are planned
+
+If you were previously using the archived repository, consider switching to this fork to receive updates and future enhancements.
 
 ---
-### FOR SUPPORT, DISCUSSION, GETTING INVOLVED ###
+# Support, Discussion, and Getting Involved
 
-Please join the DVSwitch group at groups.io for online forum support, discussion, and to become part of the development team.
+If you need support, want to discuss the project, or are interested in contributing to development, please contact:
 
-DVSwitch@groups.io 
+* **Developer & maintaner:** Dorian (JereFirma69)
+* **Callsign:** 9A3COX
+* **Email:** [dorian.jercic@gmail.com](mailto:dorian.jercic@gmail.com)
+* **GitHub:** https://github.com/JereFirma69
 
-A voluntary registrty for HBlink systems with public access has been created at http://hblink-register.com.es Please consider listing your system if you allow open access.
+Contributions, bug reports, and feature suggestions are welcome via GitHub Issues or Pull Requests.
+
+### Public HBlink Systems Registry
+
+A voluntary registry for HBlink systems with public access exists at:
+
+http://hblink-register.com.es
+
+If you operate an open-access HBlink system, consider listing it there so other users can discover and connect to your network.
 
 ---
 
-## PROJECT: Open Source HomeBrew Repeater Protocol Client/Master. ##
+# PROJECT: Open Source HomeBrew Repeater Protocol Client/Master. ##
 
 **UPDATES:**
 
@@ -20,7 +43,7 @@ A voluntary registrty for HBlink systems with public access has been created at 
 For those who will ask: This is a piece of software that implements an open-source, amateur radio networking protocol. It is not a network. It is not intended to be a network. It is not intended to replace or circumvent a network. People do those things, code doesn't.
   
 **PROPERTY:**  
-This work represents the author's interpretation of the HomeBrew Repeater Protocol, based on the 2015-07-26 documents from DMRplus, "IPSC Protocol Specs for homebrew DMR repeater" as written by Jonathan Naylor, G4KLX; Hans Barthen, DL5DI; Torsten Shultze, DG1HT, also licenced under Creative Commons BY-NC-SA license.
+This work represents the author's interpretation of the HomeBrew Repeater Protocol, based on the 2015-07-26 documents from DMRplus, "IPSC Protocol Specs for homebrew DMR repeater" as written by Dorian Jercic, 9A3COX, Jonathan Naylor, G4KLX; Hans Barthen, DL5DI; Torsten Shultze, DG1HT, also licenced under Creative Commons BY-NC-SA license.
 
 **WARRANTY**
 None. The owners of this work make absolutely no warranty, express or implied. Use this software at your own risk.
@@ -56,11 +79,28 @@ chown 54000 -R /var/log/hblink.log
  run -v /var/log/hblink/hblink.log:/var/log/hblink/hblink.log -e GIT_USER=$USER -e GIT_PASSWORD=$PASSWORD -e GIT_REPO=$URL_TO_REPO_WITHOUT_HTTPS://  -p 54000:54000  shaymez/hblink3:latest
  ```
 
-**MORE DOCUMENTATION TO COME**
+---
 
-***0x49 DE N0MJS***
+# Documentation
+
+Additional documentation for this fork will be added as development progresses. Planned documentation includes:
+
+* Installation and setup guides
+* Configuration examples
+* Network topology examples
+* Feature documentation for new additions
+* Development and contribution guidelines
+
+Users and contributors are encouraged to open GitHub Issues for questions, bug reports, or documentation requests.
+
+---
+
+## ***0x49 DE 9A3COX***
 
 Copyright (C) 2016-2020 Cortney T. Buffington, N0MJS n0mjs@me.com
+
+Copyright (C) 2026–present JereFirma69 (9A3COX)
+[dorian.jercic@gmail.com](mailto:dorian.jercic@gmail.com)
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
